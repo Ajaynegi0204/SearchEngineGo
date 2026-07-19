@@ -23,17 +23,12 @@ type queryResponse struct {
 }
 
 type problemResult struct {
-	ID            int64    `json:"id"`
-	Title         string   `json:"title"`
-	Slug          string   `json:"slug"`
-	URL           string   `json:"url"`
-	Difficulty    string   `json:"difficulty"`
-	Tags          []string `json:"tags"`
-	StatementText string   `json:"statement_text"`
-	RRFScore      float64  `json:"rrf_score"`
-	RerankScore   float64  `json:"rerank_score"`
-	BM25Rank      int      `json:"bm25_rank"`
-	EmbeddingRank int      `json:"embedding_rank"`
+	ID         int64    `json:"id"`
+	Title      string   `json:"title"`
+	Slug       string   `json:"slug"`
+	URL        string   `json:"url"`
+	Difficulty string   `json:"difficulty"`
+	Tags       []string `json:"tags"`
 }
 
 func NewQueryHandler(searchEngine *search.HybridEngine) *QueryHandler {
@@ -63,17 +58,12 @@ func (h *QueryHandler) Query(w http.ResponseWriter, r *http.Request) {
 	responseResults := make([]problemResult, 0, len(results))
 	for _, result := range results {
 		responseResults = append(responseResults, problemResult{
-			ID:            result.Problem.ID,
-			Title:         result.Problem.Title,
-			Slug:          result.Problem.Slug,
-			URL:           result.Problem.URL,
-			Difficulty:    result.Problem.Difficulty,
-			Tags:          result.Problem.Tags,
-			StatementText: result.Problem.StatementText,
-			RRFScore:      result.RRFScore,
-			RerankScore:   result.RerankScore,
-			BM25Rank:      result.BM25Rank,
-			EmbeddingRank: result.EmbeddingRank,
+			ID:         result.Problem.ID,
+			Title:      result.Problem.Title,
+			Slug:       result.Problem.Slug,
+			URL:        result.Problem.URL,
+			Difficulty: result.Problem.Difficulty,
+			Tags:       result.Problem.Tags,
 		})
 	}
 
