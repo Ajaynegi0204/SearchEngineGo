@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
-import { ProtectedRoute } from './ProtectedRoute';
+import { FallbackRoute, ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute';
 import Signup from './Signup';
 import Home from './Home';
 import Dashboard from './Dashboard';
@@ -12,12 +12,16 @@ function App() {
     <AuthProvider>
       <ToastContainer position="top-right" theme="dark" />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Signup />} />
-        
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+        </Route>
+
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
+
+        <Route path="*" element={<FallbackRoute />} />
       </Routes>
     </AuthProvider>
   );

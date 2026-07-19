@@ -43,7 +43,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser, err := h.authService.Signup(r.Context(), request.Email, request.Password)
+	newUser, tokens, err := h.authService.Signup(r.Context(), request.Email, request.Password)
 	if err != nil {
 		if errors.Is(err, auth.ErrEmailAlreadyRegistered) {
 			writeError(w, http.StatusConflict, err.Error())
@@ -58,7 +58,10 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, publicUser{ID: newUser.ID.String(), Email: newUser.Email})
+	writeJSON(w, http.StatusCreated, authResponse{
+		User:   publicUser{ID: newUser.ID.String(), Email: newUser.Email},
+		Tokens: tokens,
+	})
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {

@@ -54,15 +54,15 @@ func NewService(store *storage.PostgresStore, jwtSecret string) (*Service, error
 	return &Service{store: store, jwtSecret: []byte(jwtSecret)}, nil
 }
 
-func (s *Service) Signup(ctx context.Context, email, password string) (models.User, error) {
+func (s *Service) Signup(ctx context.Context, email, password string) (models.User, Tokens, error) {
 	email, err := validateCredentials(email, password)
 	if err != nil {
-		return models.User{}, err
+		return models.User{}, Tokens{}, err
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return models.User{}, fmt.Errorf("hash password: %w", err)
+		return models.User{}, Tokens{}, fmt.Errorf("hash password: %w", err)
 	}
 
 	newUser, err := s.store.CreateUser(ctx, email, string(passwordHash))
@@ -71,12 +71,17 @@ func (s *Service) Signup(ctx context.Context, email, password string) (models.Us
 		if errors.As(err, &postgresError) &&
 			postgresError.Code == "23505" &&
 			postgresError.ConstraintName == "users_email_lower_unique" {
-			return models.User{}, ErrEmailAlreadyRegistered
+			return models.User{}, Tokens{}, ErrEmailAlreadyRegistered
 		}
-		return models.User{}, err
+		return models.User{}, Tokens{}, err
 	}
 
-	return newUser, nil
+	tokens, err := s.createTokens(ctx, newUser.ID)
+	if err != nil {
+		return models.User{}, Tokens{}, fmt.Errorf("create signup tokens: %w", err)
+	}
+
+	return newUser, tokens, nil
 }
 
 func (s *Service) Login(ctx context.Context, email, password string) (models.User, Tokens, error) {

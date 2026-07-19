@@ -26,6 +26,37 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key !== 'access_token' && event.key !== 'user') {
+        return;
+      }
+
+      const nextToken = localStorage.getItem('access_token');
+      const storedUser = localStorage.getItem('user');
+
+      let nextUser = null;
+      if (storedUser) {
+        try {
+          nextUser = JSON.parse(storedUser);
+        } catch {
+          nextUser = null;
+        }
+      }
+
+      setToken(nextToken);
+      tokenRef.current = nextToken;
+      setUser(nextUser);
+
+      if (!nextToken) {
+        navigate('/', { replace: true });
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [navigate]);
+
+  useEffect(() => {
     const requestInterceptor = api.interceptors.request.use((config) => {
       if (tokenRef.current) {
         config.headers.Authorization = `Bearer ${tokenRef.current}`;
@@ -88,14 +119,18 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user');
   };
 
+  const startSession = (authResponse) => {
+    saveTokens(authResponse.tokens);
+    setUser(authResponse.user);
+    localStorage.setItem('user', JSON.stringify(authResponse.user));
+    navigate('/dashboard');
+  };
+
   const login = async (credentials) => {
     setLoading(true);
     try {
       const { data } = await api.post('/api/v1/auth/login', credentials);
-      saveTokens(data.tokens);
-      setUser(data.user);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/dashboard');
+      startSession(data);
       toast.success('Logged in successfully');
     } catch (error) {
       const message = error.response?.data?.error || 'Login failed';
@@ -119,7 +154,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ api, user, token, loading, isLoggedIn: Boolean(token), login, logout }}>
+    <AuthContext.Provider value={{ api, user, token, loading, isLoggedIn: Boolean(token), login, logout, startSession }}>
       {children}
     </AuthContext.Provider>
   );

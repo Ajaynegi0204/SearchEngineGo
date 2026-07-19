@@ -16,7 +16,7 @@ const Signup = () => {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { api, login } = useAuth();
+    const { api, login, startSession } = useAuth();
 
     const particlesInit = async (engine) => {
         await loadFull(engine);
@@ -27,11 +27,9 @@ const Signup = () => {
             setLoading(true);
             try {
                 if (state === 'Sign Up') {
-                    await api.post('/api/v1/auth/signup', { email, password });
+                    const { data } = await api.post('/api/v1/auth/signup', { email, password });
+                    startSession(data);
                     toast.success("Account created successfully!");
-                    setState('Login');
-                    setEmail("");
-                    setPassword("");
                 } else {
                      await login({ email, password });
                 }
