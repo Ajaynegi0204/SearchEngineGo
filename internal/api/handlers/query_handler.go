@@ -18,7 +18,6 @@ type queryRequest struct {
 }
 
 type queryResponse struct {
-	Query   string          `json:"query"`
 	Results []problemResult `json:"results"`
 }
 
@@ -67,5 +66,5 @@ func (h *QueryHandler) Query(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	writeJSON(w, http.StatusOK, queryResponse{Query: request.Query, Results: responseResults})
+	writeJSON(w, http.StatusOK, queryResponse{Results: responseResults})
 }
