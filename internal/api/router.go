@@ -18,6 +18,7 @@ func NewRouter(authService *auth.Service, searchEngine *search.HybridEngine) htt
 		AllowedOrigins: []string{
 			"http://localhost:5173",
 			"http://localhost:4173",
+			"https://codehunt-frontend.onrender.com",
 		},
 		AllowedMethods: []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
