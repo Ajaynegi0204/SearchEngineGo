@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+const maxQueryLength = 1000
+
 var ErrInvalidQuery = errors.New("query cannot be empty")
 
 func normalizeQuery(query string) (string, error) {
@@ -12,5 +14,11 @@ func normalizeQuery(query string) (string, error) {
 	if normalizedQuery == "" {
 		return "", ErrInvalidQuery
 	}
+
+	queryRunes := []rune(normalizedQuery)
+	if len(queryRunes) > maxQueryLength {
+		return string(queryRunes[:maxQueryLength]), nil
+	}
+
 	return normalizedQuery, nil
 }
