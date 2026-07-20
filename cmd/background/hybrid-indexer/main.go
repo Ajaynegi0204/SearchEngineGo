@@ -3,16 +3,13 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/joho/godotenv"
-
 	"problem-search/internal/background/indexing"
+	"problem-search/internal/clients/embedding"
+	"problem-search/internal/clients/qdrant"
 	"problem-search/internal/config"
-	"problem-search/internal/embedding"
-	"problem-search/internal/qdrant"
 	"problem-search/internal/storage"
 	"problem-search/internal/text"
 )
@@ -26,8 +23,6 @@ const (
 )
 
 func main() {
-	_ = godotenv.Load()
-
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -43,15 +38,15 @@ func main() {
 	defer store.Close()
 
 	vectorStore, err := qdrant.NewClient(
-		os.Getenv("QDRANT_URL"),
-		os.Getenv("QDRANT_API_KEY"),
+		cfg.QdrantURL,
+		cfg.QdrantAPIKey,
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer vectorStore.Close()
 
-	embeddingClient, err := embedding.NewCohereClient(os.Getenv("COHERE_API_KEY"))
+	embeddingClient, err := embedding.NewCohereClient(cfg.CohereAPIKey)
 	if err != nil {
 		log.Fatal(err)
 	}

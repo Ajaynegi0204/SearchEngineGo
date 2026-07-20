@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"problem-search/internal/background/ingest"
-	"problem-search/internal/background/leetcode"
+	"problem-search/internal/background/ingestion"
+	"problem-search/internal/clients/leetcode"
 	"problem-search/internal/config"
 	"problem-search/internal/storage"
 )
@@ -37,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ingester := ingest.NewLeetCodeIngester(client, store)
+	ingester := ingestion.NewLeetCodeIngester(client, store)
 
 	skip := 0
 	limit := 20

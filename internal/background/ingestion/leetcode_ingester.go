@@ -1,4 +1,4 @@
-package ingest
+package ingestion
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"problem-search/internal/background/leetcode"
+	"problem-search/internal/clients/leetcode"
 	"problem-search/internal/models"
 	"problem-search/internal/storage"
 	"problem-search/internal/text"

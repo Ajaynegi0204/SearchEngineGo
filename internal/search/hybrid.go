@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"problem-search/internal/embedding"
+	"problem-search/internal/clients/embedding"
+	"problem-search/internal/clients/qdrant"
+	"problem-search/internal/clients/rerank"
 	"problem-search/internal/models"
-	"problem-search/internal/qdrant"
-	"problem-search/internal/rerank"
 	"problem-search/internal/retrieval"
 	"problem-search/internal/storage"
 	"problem-search/internal/text"

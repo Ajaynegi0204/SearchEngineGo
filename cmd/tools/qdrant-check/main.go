@@ -8,7 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"problem-search/internal/qdrant"
+	"problem-search/internal/clients/qdrant"
 )
 
 func main() {

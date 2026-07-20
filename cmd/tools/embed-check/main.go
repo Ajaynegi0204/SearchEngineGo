@@ -8,7 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"problem-search/internal/embedding"
+	"problem-search/internal/clients/embedding"
 )
 
 func main() {

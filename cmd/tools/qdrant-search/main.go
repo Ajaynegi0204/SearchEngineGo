@@ -10,8 +10,8 @@ import (
 
 	"github.com/joho/godotenv"
 
+	"problem-search/internal/clients/qdrant"
 	"problem-search/internal/config"
-	"problem-search/internal/qdrant"
 	"problem-search/internal/retrieval"
 	"problem-search/internal/storage"
 )

@@ -4,19 +4,16 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 
-	"github.com/joho/godotenv"
-
 	"problem-search/internal/api"
 	"problem-search/internal/auth"
+	"problem-search/internal/clients/embedding"
+	"problem-search/internal/clients/qdrant"
+	"problem-search/internal/clients/rerank"
 	"problem-search/internal/config"
-	"problem-search/internal/embedding"
-	"problem-search/internal/qdrant"
-	"problem-search/internal/rerank"
 	"problem-search/internal/retrieval"
 	"problem-search/internal/search"
 	"problem-search/internal/storage"
@@ -29,8 +26,6 @@ const (
 )
 
 func main() {
-	_ = godotenv.Load()
-
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -45,18 +40,18 @@ func main() {
 	}
 	defer store.Close()
 
-	vectorStore, err := qdrant.NewClient(os.Getenv("QDRANT_URL"), os.Getenv("QDRANT_API_KEY"))
+	vectorStore, err := qdrant.NewClient(cfg.QdrantURL, cfg.QdrantAPIKey)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer vectorStore.Close()
 
-	embeddingClient, err := embedding.NewCohereClient(os.Getenv("COHERE_API_KEY"))
+	embeddingClient, err := embedding.NewCohereClient(cfg.CohereAPIKey)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	rerankerClient, err := rerank.NewCohereClient(os.Getenv("COHERE_API_KEY"))
+	rerankerClient, err := rerank.NewCohereClient(cfg.CohereAPIKey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,18 +76,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	authService, err := auth.NewService(store, os.Getenv("JWT_SECRET"))
+	authService, err := auth.NewService(store, cfg.JWTSecret)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	port := 8080
-	if configuredPort := os.Getenv("PORT"); configuredPort != "" {
-		port, err = strconv.Atoi(configuredPort)
-		if err != nil || port < 1 || port > 65535 {
-			log.Fatal("PORT must be a valid TCP port")
-		}
-	}
+	port := cfg.Port
 
 	server := &http.Server{
 		Addr:              ":" + strconv.Itoa(port),

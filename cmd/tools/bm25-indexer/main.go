@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"problem-search/internal/background/indexing"
+	"problem-search/internal/clients/qdrant"
 	"problem-search/internal/config"
-	"problem-search/internal/qdrant"
 	"problem-search/internal/storage"
 )
 
